@@ -1,0 +1,260 @@
+---
+title: "Task1: Exploratory Data Analysis for “Marriage and Divorce Dataset”"
+author: "Han Hoang"
+date: "Fall 2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**0. Create the Processed Marriage dataset**
+```{r}
+Marriage <- read.csv("C:/Users/katie/Downloads/Processed_Marriage_Divorce_DB.csv")
+```
+
+**1. Compute the covariance matrix for each pair of the following attributes: Age, Gap, Economic Similarity, Common Interests and Divorce Score;  next, compute the correlations for each of the 10 pairs of the 5 attributes. Interpret the statistical findings! **
+
+**Covariance matrix**
+
+```{r, echo=FALSE}
+df = Marriage[,c(1,3,7,31)]
+knitr::kable(cov(df), caption = "Table 1.1: Covariance matrix")
+```
+
+**Correlation matrix**
+```{r,echo=FALSE}
+knitr::kable(cor(df), caption = "Table 1.2: Correlation matrix")
+```
+
+**Interpretation** 
+
+- Age Gap and Economic Similarity with negative correlation indicates that people with wider age gap have less economic similarity.
+- Age Gap and Common Interests with negative correlation indicates that the wider the age gap, the less common interests they share.
+- Economy Similarity and Divorce Score with negative correlation indicates that people with more economic similarity have lower divorce score.
+- Common Interests and Divorce Score with negative correlation indicates that people sharing more common interests have lower divorce score
+- Age Gap and Divorce Score with positive correlation indicates that the wider the age gap, the higher the divorce score
+- Economic Similarity and Common Interests with positive correlation indicates that people with more economic similarity share more common interests.
+
+**2.	Create a scatter plot for the attributes Common Interests and Love. Interpret the scatter plot! **
+
+```{r,echo=FALSE}
+plot(Marriage$Common.Interests~Marriage$Love, xlab = "Common Interests", ylab ="Love", pch = 19, col = "blue")
+cor(Marriage$Common.Interests,Marriage$Love)
+```
+*Interpretation* There is no correlation between Common Interests and Love. This can be explained by a very small $r=-0.076$ between 2 attributes.
+
+**3.	Create histograms for Divorce, Desire to Marry, and Common Interests attributes for both the Marry and the Divorce recommendations; interpret the obtained 6 histograms. **
+
+```{r, echo=FALSE}
+# Split the data by class of Recommendation
+Marriage_M = Marriage[Marriage$Recommendation == "Marry", ]
+Marriage_D = Marriage[Marriage$Recommendation == "Divorce", ]
+
+# Histograms
+par(mfrow=c(3,2))
+hist(Marriage_M$Divorce.Score, xlab = "Divorce Score", main = "Divorce Score for Marry recommendation", col = "lightblue")
+hist(Marriage_D$Divorce.Score, xlab = "Divorce Score", main = "Divorce Score for Divorce recommendation", col = "lightpink")
+hist(Marriage_M$Desire.to.Marry, xlab = "Desire to Marry", main = "Desire to Marry for Marry recommendation", col = "lightblue")
+hist(Marriage_D$Desire.to.Marry, xlab = "Desire to Marry", main = "Desire to Marry for Divorce recommendation", col = "lightpink")
+hist(Marriage_M$Common.Interests, xlab = "Common Interests", main = "Common Interests for Marry recommendation", col = "lightblue")
+hist(Marriage_D$Common.Interests, xlab = "Common Interests", main = "Common Interests for Divorce recommendation", col = "lightpink")
+```
+**Histogram 1 - Divorce Score for Marry recommendation:** This is a unimodal histogram with most of divorce score is in the range of 1.3-1.4, which is to the left of the histogram. Although the histogram is asymetrical, the divorce score mean and median, whose values are both 1.5, lie in the middle of the histogram
+
+**Histogram 2 - Divorce Score for Divorce recommendation:** This is a multimodal histogram in which the 3 divorce score peaks are 2.0-2.1, 2.3-2.4 and 2.9-3.0. However, the divorce score mean and median, whose values are both 2.5, lies in the middle of the histogram.
+
+**Histogram 3 - Desire to Marry for Marry recommendation:** This is a bimodal histogram with 2 peaks at 40-50 and 80-90. Here, the desire to marry mean (approx. 50) is greater than the median (approx. 46), which means there are more values on the right of the histogram
+
+**Histogram 4 - Desire to Marry for Divorce recommendation:** This is a unimodal histogram with most frequency at 30-40. The histogram also skews to the right, in which the desire to marry mean (approx. 45) is greater than the median (approx. 43).
+
+**Histogram 5 - Common Interests for Marry recommendation:** This is a symmetrical and unimodal histogram with most frequency at 70-75, which is in the middle. The common interest mean and median also lie in this range, which is both equal to approximately 75.
+
+**Histogram 6 - Common Interests for Divorce recommendation:** This is a bimodel histogram with 2 peaks at 70-75 and 80-85. In which the mean and median both lie in the middle and is respectively 75 and 74.
+
+```{r, echo=FALSE, results='hide'}
+mean(Marriage_M$Divorce.Score); median(Marriage_M$Divorce.Score)
+mean(Marriage_D$Divorce.Score); median(Marriage_D$Divorce.Score)
+mean(Marriage_M$Desire.to.Marry); median(Marriage_M$Desire.to.Marry)
+mean(Marriage_D$Desire.to.Marry); median(Marriage_D$Desire.to.Marry)
+mean(Marriage_M$Common.Interests); median(Marriage_M$Common.Interests)
+mean(Marriage_D$Common.Interests); median(Marriage_D$Common.Interests)
+```
+
+**4.	Create box plots for the Self Confidence attribute for the instances of each class—one for M and D — and a third box plot for all instances in the dataset. Interpret and compare the 3 box plots for each attribute! 4 points **
+
+```{r, echo=FALSE, results='hide'}
+median(Marriage_M$Self.Confidence)
+median(Marriage_D$Self.Confidence)
+median(Marriage$Self.Confidence)
+```
+
+```{r, echo=FALSE, out.width="75%"}
+boxplot(Marriage_M$Self.Confidence, Marriage_D$Self.Confidence, Marriage$Self.Confidence, 
+        names = c("Marry","Divorce","Marry/Divorce"), 
+        col = "lightblue", 
+        horizontal = T, 
+        main = "Self Confidence by Class")
+```
+
+**Interpretation**
+
+- All 3 boxplots are slightly left-skewed in which the whisker is shorter on the upper end of the boxes.
+- The medians of all boxplots are more or less the same, ranging from 70 to 75. To be more specifically, the median of self confidence of class M is the highest (74.36), followed by that of self confidence of both classes (72.73) and lastly the median of self confidence of class D (71.41).
+- The 3 whiskers of 3 boxplots are almost the same (99% overlap) with the range from 40 to 100.
+- In terms of IQR, the IQR of class "Marry" and of both classes overlap approximately 98%. Class "Divorce" has the narrowest IQR, yet very similar to those of other two boxplots with 90% overlap.
+- There are no outliers detected in three boxplots.
+
+**5.	Create supervised scatter plots/supervised density plots for the following 3 pairs of attributes using the Class  attribute as a class variable: Economic Similarity & Common Interests, Common Interests & Loyalty and Economic Similarity & Loyalty. Use different colors for the class variable. Interpret the obtained plots; in particular, address what can be said about the difficulty in predicting the Recommendation and the distribution of the instances of the two classes.**
+
+```{r, echo = FALSE, out.width="75%", warning=FALSE}
+library("ggplot2")
+ggplot(Marriage, aes(x = Common.Interests, y = Economic.Similarity, colour = Recommendation)) +
+  geom_point() +
+  ggtitle("Economic Similarity & Common Interests") +
+  geom_smooth(method = "lm",se=FALSE)
+
+ggplot(Marriage, aes(x = Common.Interests, y = Loyalty, colour = Recommendation)) +
+  geom_point() +
+  ggtitle("Common Interests & Loyalty") +
+  geom_smooth(method = "lm",se=FALSE)
+
+ggplot(Marriage, aes(x = Economic.Similarity, y = Loyalty, colour = Recommendation)) +
+  geom_point() + 
+  ggtitle("Economic Similarity & Loyalty") +
+  geom_smooth(method = "lm",se=FALSE)
+```
+
+**Interpretation**
+
+From the three scatterplots, there is a slightly positive correlation between Economic Similarity & Loyalty in class Marry, which can be visualized by the red regression line with a visible upward slope. Except that, there is nearly no correlation shown between the remaining pairs: Economic Similarity & Common Interests and Common Interests & Loyalty.
+
+In addition, the data points in both red and blue are distributed on every region of the graph. This explains why almost all the obtained regression lines have relatively small slopes. Few data points from class Marry and Divorce are very nearby or also overlapped. Hence, the decision boundary between two classes cannot be easily defined and predicting the `Recommendation` attribute can be challenging.
+
+**6.	Create 2 density plots for the instances of the 2 classes in the Age Gap/Social Gap space. Compare the 2 density plots! **
+
+```{r, echo = FALSE, out.width="50%", out.height="50%"}
+ggplot(Marriage, aes(Age.Gap, col=Recommendation, fill=Recommendation)) + 
+    geom_density(alpha=.5) 
+ggplot(Marriage, aes(Social.Gap, col=Recommendation, fill=Recommendation)) + 
+    geom_density(alpha=.5)
+```
+
+In terms of similarity, all four density plots have continuous curves with no gaps or outliers. Both density plots of Class Divorce (red plots) are bimodal with two well separated maxima. However, the plot for Social Gap is not as symmetric as that for Age Gap.
+
+Moreover, density plots of Class Marry have two different distributions. The density plot for Age Gap (blue plot) is symmetric with a bell-curved shape. This density plot is visibly unimodal while the density plot for Social Gap is more likely to be bimodal with quite similar density (approximately 0.01).
+
+**7.	Create a new dataset Z-Processed Marriage from the Processed Marriage dataset by transforming the first 30 continuous attributes into z-scores. Fit a linear model that predicts the  Divorce Score attribute using the 30 z-scored, continuous attributes as the independent variables. Report the R2 of the linear model and the coefficients of each attribute in the obtained regression function. What do the obtained coefficients tell you about the importance of each attribute for predicting a successful marriage?**
+
+```{r}
+#Z-scoring Marriage dataset
+Marriage_standardized <- data.frame(scale(Marriage[1:30]))
+Marriage_new <- data.frame(Marriage_standardized, Marriage[,31:32])
+```
+
+After fitting a linear model to the z-scored dataset, we obtained a regression function with an R-squared of 0.298 and the following coefficients:
+
+```{r, echo=FALSE, results='asis'}
+#Fit linear model
+lm.fit <-lm(Divorce.Score ~ .-Recommendation, data=Marriage_new)
+knitr::kable(summary(lm.fit)$coef)
+sprintf("Obtained R2: %f", summary(lm.fit)$r.squared) 
+
+```
+
+The obtained coefficients show that `Education` is the most important predictor with $\beta = -0.2$, followed by `Desire to Marry` and `Good Income` both with $\beta = 0.1$. The remaining 27 attributes are visibly not as important, all of which have $\beta < 0.1$. Therefore, the regression model with 30 attributes results in a quite small R2 (0.298) which indicates the model is not predicting a successful marriage very well.
+
+**8.	Create 3 decision tree models with 20 or less nodes for the dataset (leaf nodes count; do not submit models with more than 20 nodes!); use the Recommendation attribute as the class variable, and use 28 of the continuous attributes of the dataset, excluding the Second (Education) and Eleventh (Independency) attribute when building the decision tree model. Explain how the 3 decision tree models were obtained! Report the training accuracy and the testing accuracy of the submitted decision trees. Interpret the learnt decision tree. What does it tell you about the importance of the 28 chosen attributes for the classification problem?**
+
+```{r, warning=FALSE, echo=FALSE}
+library(rpart)
+library(rpart.plot)
+library(tree)
+library(caret)
+
+# Model 1 (28 attributes)
+# Create a new dataset excluding Education and Independency attribute
+Marriage2 <- subset(Marriage, select = -c(Education, Independency, Divorce.Score))
+Marriage2$Recommendation = as.factor(Marriage2$Recommendation)
+
+# Training
+set.seed(10)
+sample = sample.int(n=nrow(Marriage2),
+                    size=round(.8*nrow(Marriage2)),
+                    replace=FALSE)
+train = Marriage2[sample,]
+test = Marriage2[-sample,]
+
+# Decision tree
+tree1 = rpart(Recommendation ~ . , data = train, method = "class")
+rpart.plot(tree1)
+
+# Test accuracy
+tree1.predicted = predict(tree1,test,type="class")
+tree1.matrix = table(tree1.predicted, test$Recommendation)
+(tree1.matrix)
+mse1 = (tree1.matrix[1,1]+tree1.matrix[2,2])/sum(tree1.matrix)
+sprintf("Model 1 test accuracy: %f", mse1)
+
+# Model 2 (first 20 attributes, exclude Education & Independency)
+Marriage3 <- Marriage2[,c(1:20,29)]
+Marriage3$Recommendation = as.factor(Marriage3$Recommendation)
+
+# Training
+set.seed(10)
+sample = sample.int(n=nrow(Marriage3),
+                    size=round(.8*nrow(Marriage3)),
+                    replace=FALSE)
+train2 = Marriage3[sample,]
+test2 = Marriage3[-sample,]
+
+# Decision tree
+tree2 = rpart(Recommendation ~ . , data = train2, method = "class")
+rpart.plot(tree2)
+
+# Test accuracy
+tree2.predicted = predict(tree2,test2,type="class")
+tree2.matrix = table(tree2.predicted, test2$Recommendation)
+(tree2.matrix)
+mse2 = (tree2.matrix[1,1]+tree2.matrix[2,2])/sum(tree2.matrix)
+sprintf("Model 2 test accuracy: %f", mse2)
+
+# Model 3 (first 10 attributes, exclude Education & Independency)
+Marriage4 <- Marriage2[,c(1:10,29)]
+Marriage4$Recommendation = as.factor(Marriage4$Recommendation)
+
+# Training
+set.seed(10)
+sample = sample.int(n=nrow(Marriage4),
+                    size=round(.8*nrow(Marriage4)),
+                    replace=FALSE)
+train3 = Marriage4[sample,]
+test3 = Marriage4[-sample,]
+
+# Decision tree
+tree3 = rpart(Recommendation ~ . , data = train3, method = "class")
+rpart.plot(tree3)
+
+# Test accuracy
+tree3.predicted = predict(tree3,test3,type="class")
+tree3.matrix = table(tree3.predicted, test3$Recommendation)
+(tree3.matrix)
+mse3=(tree3.matrix[1,1]+tree3.matrix[2,2])/sum(tree3.matrix)
+sprintf("Model 3 test accuracy: %f", mse3)
+```
+
+Before fitting the tree models, I divided the dataset using 80/20 split to train the model on the 80% training data, and record the test accuracy on left out 20% testing data. 
+
+For the first model, I fitted the tree with all 28 attributes in the dataset, excluding Education and Independency and ended up with a tree of 9 nodes. In this tree, Divorce in the Family of Grade 1 is the most important attribute, followed by Loyalty, Engagement time, and Social Gap. Also, the first tree model obtained a test accuracy of 0.6 (60%).
+
+Proceeding to the second model, the tree is fitted with the first 20 attributes of the dataset, excluding Education and Independency and has a total of 11 nodes. Here, Engagement Time is most important attribute, followed by Number of Children from previous Marriage, Mental Health and Previous Trading. However, this model obtained a lower test accuracy of the first one, which is 0.55 (55%). 
+
+Finally, for the third model, I fitted the tree with the first 10 attributes in the dataset, excluding Education and Independency and obtained a tree with 11 nodes. The attributes used in the tree are Number of Children from previous Marriage, Common Interests, Economic Similarity and Relationship with the Spouse Family, which are also the important ones. However, we observed the lowest test accuracy of 40% for this model. 
+
+In conclusion, the first tree models constructed with 28 attributes is still the best model to predict `Recommendation`. The most significant attributes should be those used in the first tree as well.
+
+**9.	Write a conclusion (<13 sentences) summarizing the most important findings of this task; in particular address the findings obtained related to predicting a successful marriage (the values of attributes 31 and 32) using attributes 1-30. If possible, write about which attributes seem useful for predicting successful marriages and what you as an individual can learn from this dataset!**
+
+Firstly, by observing the correlation matrix, there are very little correlation between the attributes in the dataset. Second, from the scatterplot, we can see that all the data points of two classes scatter on every region of the plots and sometimes overlap. Therefore, it is difficult to define the decision boundary and predict `Recommendation` attribute for this problem. Moreover, if we fit a linear model that predicts the  Divorce Score attribute using the 30 z-scored attributes, we obtained a relatively low R2, which indicates that this is not a good model to predict a successful marriage. According to the coefficients in regression function, the most important attributes are `Education`, `Desire to Marry` and `Good Income` with significantly higher slopes than the remaining attributes. Meanwhile, when constructing the decision trees, we observed something different. Here, the most important attributes are Divorce in the Family of Grade 1, Loyalty, Engagement time, and Social Gap, which is obtained by the tree model with the largest test accuracy. Despite the difference, all the attributes I have mentioned are very likely to contribute to a successful or unsuccessful marriage.
+
